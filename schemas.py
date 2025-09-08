@@ -15,3 +15,6 @@ class UpdateTaskSchema(BaseModel):
 
 class ResponseTaskSchema(BaseModel):
     id: int
+    title: str
+    completed: Optional[bool] = False
+    description: Optional[str] = None
