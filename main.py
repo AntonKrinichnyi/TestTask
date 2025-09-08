@@ -58,3 +58,5 @@ def delete_task(id: int):
     if id not in db:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Task not found")
+    del db[id]
+    return {"message": "Deleted successfuly"}
