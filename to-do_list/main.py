@@ -1,5 +1,4 @@
 from typing import Dict
-
 from fastapi import FastAPI, HTTPException, status
 
 from schemas import CreateTaskSchema, UpdateTaskSchema, ResponseTaskSchema
