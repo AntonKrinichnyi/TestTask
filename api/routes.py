@@ -1,15 +1,18 @@
 from typing import Dict
-from fastapi import FastAPI, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 
-from schemas import CreateTaskSchema, UpdateTaskSchema, ResponseTaskSchema
+from api.schemas import CreateTaskSchema, UpdateTaskSchema, ResponseTaskSchema, PredictionRequestSchema, PredictionResponseSchema
+from model import tokinize_sentese
+from joblib import load
 
-app = FastAPI()
+router = APIRouter()
+ml_model = load("./model.joblib")
 
 id_count = 0
 db: Dict[int, dict] = {}
 
 
-@app.get(
+@router.get(
     "/tasks",
     response_model=list[ResponseTaskSchema],
     status_code=status.HTTP_200_OK,
@@ -19,7 +22,7 @@ def get_tasks():
     return list(db.values())
 
 
-@app.post(
+@router.post(
     "/tasks",
     response_model=ResponseTaskSchema,
     status_code=status.HTTP_201_CREATED,
@@ -35,7 +38,7 @@ def create_task(task: CreateTaskSchema):
     return new_task
 
 
-@app.put(
+@router.put(
     "/tasks/{id}",
     response_model=ResponseTaskSchema,
     status_code=status.HTTP_200_OK,
@@ -55,7 +58,7 @@ def update_task(id: int, update: UpdateTaskSchema):
     return updated_task
 
 
-@app.delete(
+@router.delete(
     "/tasks/{id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete task by id"
@@ -68,3 +71,15 @@ def delete_task(id: int):
     del db[id]
 
     return {"message": "Deleted successfuly"}
+
+
+@router.post(
+    "/prediction",
+    response_model=PredictionResponseSchema,
+    status_code=status.HTTP_200_OK,
+    summary="Predict how importent task"
+)
+def prediction(task: PredictionRequestSchema):
+    task_string = task.task_description
+    prediction = ml_model.predict([task_string])
+    return {"prediction": prediction[0]}

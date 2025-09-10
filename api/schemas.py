@@ -18,3 +18,9 @@ class ResponseTaskSchema(BaseModel):
     title: str
     completed: Optional[bool] = False
     description: Optional[str] = None
+
+class PredictionRequestSchema(BaseModel):
+    task_description: str
+
+class PredictionResponseSchema(BaseModel):
+    prediction: str
